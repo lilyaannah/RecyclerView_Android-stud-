@@ -14,6 +14,14 @@
             android:layout_height="200dp"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="16dp" />
+        <Button
+            android:id="@+id/detailsLinkButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/detailsDescriptionTextView"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            android:text="Watch the Movie" />
 
         <TextView
             android:id="@+id/detailsTitleTextView"
@@ -60,5 +68,6 @@
             android:layout_marginTop="8dp"
             android:textSize="16sp"
             android:lineSpacingExtra="4dp" />
+
     </RelativeLayout>
 </ScrollView>

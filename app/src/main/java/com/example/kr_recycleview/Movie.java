@@ -18,6 +18,14 @@ public class Movie implements Serializable{
         this.streamingLink = streamingLink;
         this.description = description;
     }
+    public Movie(String title, String genre, int year, double rating,String streamingLink,String description) {
+        this.title = title;
+        this.genre = genre;
+        this.year = year;
+        this.rating = rating;
+        this.streamingLink = streamingLink;
+        this.description = description;
+    }
 
     public String getTitle() {
         return title;

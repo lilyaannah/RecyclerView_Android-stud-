@@ -16,8 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-    public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder>  implements Filterable {
-
+    public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> implements Filterable {
         private List<Movie> movieList;
         private List<Movie> filteredMovieList; // Список для фильтрации
         private Context context;
@@ -37,7 +36,7 @@ import java.util.List;
 
         @Override
         public void onBindViewHolder(@NonNull MovieViewHolder holder, int position) {
-            Movie movie = movieList.get(position);
+            Movie movie = filteredMovieList.get(position);  // Изменили на filteredMovieList
 
             holder.titleTextView.setText(movie.getTitle());
             holder.genreTextView.setText(movie.getGenre());
@@ -71,7 +70,7 @@ import java.util.List;
 
         @Override
         public int getItemCount() {
-            return filteredMovieList.size();
+            return filteredMovieList.size(); // Используем filteredMovieList
         }
 
         @Override
@@ -83,11 +82,26 @@ import java.util.List;
                     List<Movie> filtered = new ArrayList<>();
 
                     if (query.isEmpty()) {
-                        filtered = movieList;
+                        filtered.addAll(movieList); // Когда поиск пустой, показываем весь список
                     } else {
+                        // Разделяем строку запроса на отдельные жанры
+                        String[] genres = query.split("\\s*,\\s*|\\s+");  // Разделение по запятой или пробелу
+
+                        // Фильтрация по названию и жанру
                         for (Movie movie : movieList) {
-                            if (movie.getTitle().toLowerCase().contains(query) ||
-                                    movie.getGenre().toLowerCase().contains(query)) {
+                            boolean match = false;
+
+                            // Проверяем, есть ли все жанры в жанре фильма
+                            for (String genre : genres) {
+                                if (movie.getGenre().toLowerCase().contains(genre)) {
+                                    match = true;
+                                } else {
+                                    match = false;
+                                    break; // Если хотя бы один жанр не совпадает, то не показываем фильм
+                                }
+                            }
+
+                            if (match) {
                                 filtered.add(movie);
                             }
                         }
@@ -100,8 +114,11 @@ import java.util.List;
 
                 @Override
                 protected void publishResults(CharSequence constraint, FilterResults results) {
-                    filteredMovieList = (List<Movie>) results.values;
-                    notifyDataSetChanged();
+                    filteredMovieList.clear();  // Очищаем список
+                    if (results.values != null) {
+                        filteredMovieList.addAll((List<Movie>) results.values);  // Добавляем отфильтрованные элементы
+                    }
+                    notifyDataSetChanged();  // Обновляем отображение
                 }
             };
         }
@@ -120,4 +137,4 @@ import java.util.List;
                 imageView = itemView.findViewById(R.id.imageView);
             }
         }
-    }
+}

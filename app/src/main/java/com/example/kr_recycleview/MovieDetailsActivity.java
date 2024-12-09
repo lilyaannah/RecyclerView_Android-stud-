@@ -1,7 +1,9 @@
 package com.example.kr_recycleview;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -9,11 +11,33 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MovieDetailsActivity extends AppCompatActivity {
 
+    public void streamingToMovie() {
+
+        // Инициализация компонентов UI
+        TextView descriptionTextView = findViewById(R.id.detailsDescriptionTextView);
+        Button linkButton = findViewById(R.id.detailsLinkButton);
+
+        // Здесь передайте данные из объекта Movie
+        String movieDescription = "Данный фильм повествует о возникновения анти героя по имени Джокер...";
+        String movieUrl = "https://youtu.be/mj4dVlxhfA4?si=Zzby_tANwsJp9ss0"; // пример ссылки
+
+        // Устанавливаем описание фильма
+        descriptionTextView.setText(movieDescription);
+
+        // Прикрепляем слушатель на кнопку для открытия ссылки
+        linkButton.setOnClickListener(v -> {
+            Uri.parse(Uri.encode(movieUrl, ":/"));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(movieUrl));
+            startActivity(browserIntent);
+        });
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_details);
 
+        streamingToMovie();
 
         Intent intent = getIntent();
         if (intent != null) {
