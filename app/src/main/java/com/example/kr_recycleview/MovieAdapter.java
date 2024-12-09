@@ -6,19 +6,25 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
 import java.util.List;
 
-    public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
+    public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder>  implements Filterable {
 
         private List<Movie> movieList;
+        private List<Movie> filteredMovieList; // Список для фильтрации
         private Context context;
 
         public MovieAdapter(List<Movie> movieList, Context context) {
             this.movieList = movieList;
+            this.filteredMovieList = new ArrayList<>(movieList); // Изначально совпадает с оригинальным списком
             this.context = context;
         }
 
@@ -37,7 +43,13 @@ import java.util.List;
             holder.genreTextView.setText(movie.getGenre());
             holder.yearTextView.setText(String.valueOf(movie.getYear()));
             holder.ratingTextView.setText(String.valueOf(movie.getRating()));
-            holder.descriptionTextView.setText(movie.getDescription());
+
+            // Урезаем описание до 50 символов (или другой длины)
+            String truncatedDescription = movie.getDescription();
+            if (truncatedDescription.length() > 50) {
+                truncatedDescription = truncatedDescription.substring(0, 50) + "...";
+            }
+            holder.descriptionTextView.setText(truncatedDescription);
 
             // Получаем идентификатор ресурса изображения по его имени
             int imageResourceId = context.getResources().getIdentifier(movie.getImageName(), "drawable", context.getPackageName());
@@ -59,15 +71,43 @@ import java.util.List;
 
         @Override
         public int getItemCount() {
-            return movieList.size();
+            return filteredMovieList.size();
+        }
+
+        @Override
+        public Filter getFilter() {
+            return new Filter() {
+                @Override
+                protected FilterResults performFiltering(CharSequence constraint) {
+                    String query = constraint.toString().toLowerCase().trim();
+                    List<Movie> filtered = new ArrayList<>();
+
+                    if (query.isEmpty()) {
+                        filtered = movieList;
+                    } else {
+                        for (Movie movie : movieList) {
+                            if (movie.getTitle().toLowerCase().contains(query) ||
+                                    movie.getGenre().toLowerCase().contains(query)) {
+                                filtered.add(movie);
+                            }
+                        }
+                    }
+
+                    FilterResults results = new FilterResults();
+                    results.values = filtered;
+                    return results;
+                }
+
+                @Override
+                protected void publishResults(CharSequence constraint, FilterResults results) {
+                    filteredMovieList = (List<Movie>) results.values;
+                    notifyDataSetChanged();
+                }
+            };
         }
 
         public static class MovieViewHolder extends RecyclerView.ViewHolder {
-            public TextView titleTextView;
-            public TextView genreTextView;
-            public TextView yearTextView;
-            public TextView ratingTextView;
-            public TextView descriptionTextView;
+            public TextView titleTextView, genreTextView, yearTextView, ratingTextView, descriptionTextView;
             public ImageView imageView;
 
             public MovieViewHolder(@NonNull View itemView) {
